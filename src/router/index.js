@@ -19,7 +19,7 @@ const router = new VueRouter({
   ]
 })
 
-//  前置守卫
+//  前置守卫 实现重定位
 router.beforeEach((to, from, next) => {
   if (to.path !== '/login' && !store.getUser().token) return next('/login')
   next()

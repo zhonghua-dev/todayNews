@@ -2,9 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import router from '@/router'
 import '@/styles/index.less'
-import axios from 'axios'
+import router from '@/router'
+import axios from '@/api'
 
 // 注册element-ui组件
 Vue.use(ElementUI)

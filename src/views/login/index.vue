@@ -2,7 +2,7 @@
     <div class="container" ref="box">
         <el-card class="my-card">
             <img src="../../assets/images/logo_index.png" alt/>
-            <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
+            <el-form ref="loginForm" :model="loginForm" :rules="loginRules" status-icon>
                 <el-form-item prop="mobile">
                     <el-input v-model="loginForm.mobile" placeholder="请输入用户名"></el-input>
                 </el-form-item>
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import store from '@/store'
 export default {
   // mounted () {
   //   console.log(this.$refs.box)
@@ -34,7 +35,7 @@ export default {
   data () {
     const checkMobile = (rule, value, callback) => {
       if (!/^1[3-9]\d{9}$/.test(value)) {
-        return callback(new Error('手机号不合法!'))
+        return callback(new Error('请输入正确的手机号!'))
       }
       callback()
     }
@@ -47,7 +48,8 @@ export default {
       loginRules: {
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
-          { validator: checkMobile, trigger: 'change' }
+          { validator: checkMobile, trigger: 'change' },
+          { validator: checkMobile, trigger: 'blur' }
         ],
         code: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
@@ -60,8 +62,9 @@ export default {
     login () {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          this.$http.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginForm)
+          this.$http.post('authorizations', this.loginForm)
             .then(res => {
+              store.setUser(res.data.data)
               this.$router.push('/')
             })
             .catch((err) => {

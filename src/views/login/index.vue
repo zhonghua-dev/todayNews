@@ -27,6 +27,7 @@
 
 <script>
 import store from '@/store'
+
 export default {
   // mounted () {
   //   console.log(this.$refs.box)
@@ -60,16 +61,15 @@ export default {
   },
   methods: {
     login () {
-      this.$refs.loginForm.validate((valid) => {
+      this.$refs.loginForm.validate(async (valid) => {
         if (valid) {
-          this.$http.post('authorizations', this.loginForm)
-            .then(res => {
-              store.setUser(res.data.data)
-              this.$router.push('/')
-            })
-            .catch((err) => {
-              this.$message.error('手机号或验证码错误:' + err)
-            })
+          try {
+            const { data: { data } } = await this.$http.post('authorizations', this.loginForm)
+            store.setUser(data)
+            await this.$router.push('/')
+          } catch (e) {
+            this.$message.error('手机号或验证码错误 🙅')
+          }
         }
       })
     }

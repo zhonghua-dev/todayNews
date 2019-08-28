@@ -5,7 +5,10 @@ import 'element-ui/lib/theme-chalk/index.css'
 import '@/styles/index.less'
 import router from '@/router'
 import axios from '@/api'
+import myPlugin from '@/components'
 
+// 注册自定义插件
+Vue.use(myPlugin)
 // 注册element-ui组件
 Vue.use(ElementUI)
 // 向原型中添加axios

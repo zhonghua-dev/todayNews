@@ -1,6 +1,15 @@
 import axios from 'axios'
 import store from '@/store'
 import router from '@/router'
+import JSONBIGINT from 'json-bigint'
+
+axios.defaults.transformResponse = [(data) => {
+  try {
+    return JSONBIGINT.parse(data)
+  } catch (e) {
+    return data
+  }
+}]
 // 1.配置基准地址
 axios.defaults.baseURL = 'http://ttapi.research.itcast.cn/mp/v1_0/'
 // 2.配置请求头

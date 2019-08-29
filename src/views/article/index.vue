@@ -15,14 +15,7 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="频道：">
-                    <el-select clearable v-model="reqParams.channel_id" placeholder="请选择">
-                        <el-option
-                                v-for="item in channelOptions"
-                                :key="item.id"
-                                :label="item.name"
-                                :value="item.id">
-                        </el-option>
-                    </el-select>
+                    <my-channel></my-channel>
                 </el-form-item>
                 <el-form-item label="日期：">
                     <el-date-picker
@@ -92,30 +85,42 @@ export default {
         begin_pubdate: null,
         end_pubdate: null,
         page: 1,
-        per_page: 20
+        per_page: 10
       },
-      channelOptions: [],
+      // channelOptions: [],
       dateArr: [],
       articles: [],
       total: 0
     }
   },
   created () {
-    this.getChannelOptions()
+    // this.getChannelOptions()
     this.getArticles()
   },
   methods: {
+    delArticle (id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        await this.$http.delete(`articles/${id}`)
+        this.$message.success('删除成功')
+        this.getArticles()
+      }).catch(() => {
+      })
+    },
     search () {
       this.reqParams.page = 1
       if (this.reqParams.channel_id === '') this.reqParams.channel_id = null
       this.getArticles()
     },
-    async getChannelOptions () {
-      // const arr = await this.$http.get('channel')
-      // console.log(arr)
-      const { data: { data } } = await this.$http.get('channels')
-      this.channelOptions = data.channels
-    },
+    // async getChannelOptions () {
+    //   // const arr = await this.$http.get('channel')
+    //   // console.log(arr)
+    //   const { data: { data } } = await this.$http.get('channels')
+    //   this.channelOptions = data.channels
+    // },
     async getArticles () {
       const { data: { data } } = await this.$http.get('articles', { params: this.reqParams })
       this.articles = data.results

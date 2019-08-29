@@ -6,12 +6,14 @@ import Welcome from '@/views/welcome'
 import NotFound from '@/views/404'
 import store from '@/store'
 import Article from '@/views/article'
+import Test from '@/views/test'
 
 Vue.use(VueRouter)
 
 const router = new VueRouter({
   routes: [
     { path: '/login', name: 'login', component: Login },
+    { path: '/test', name: 'Test', component: Test },
     { path: '/',
       component: Home,
       children: [

@@ -69,7 +69,7 @@ import store from '@/store'
 export default {
   created () {
     const user = store.getUser()
-    // this.name = user.name
+    this.name = user.name
     this.photo = user.photo
   },
   data () {

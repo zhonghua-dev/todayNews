@@ -15,11 +15,11 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="频道：">
-                    <el-select v-model="reqParams.channel_id" placeholder="请选择">
+                    <el-select clearable v-model="reqParams.channel_id" placeholder="请选择">
                         <el-option
                                 v-for="item in channelOptions"
                                 :key="item.id"
-                                :label="item.label"
+                                :label="item.name"
                                 :value="item.id">
                         </el-option>
                     </el-select>
@@ -34,66 +34,96 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary">筛选</el-button>
+                    <el-button @click="search" type="primary">筛选</el-button>
                 </el-form-item>
             </el-form>
         </el-card>
         <el-card class="box-card">
             <div slot="header" class="clearfix">
-                <span>根据筛选条件共查询到 0 条结果：</span>
+                <span>根据筛选条件共查询到 {{ total }} 条结果：</span>
             </div>
-            <el-table :data="tableData" style="width: 100%">
-                <el-table-column prop="date" label="日期" width="180">
+            <el-table :data="articles" style="width: 100%">
+                <el-table-column label="封面">
+                    <template slot-scope="scope">
+                        <el-image :src="scope.row.cover.images[0]" style="width: 160px;height: 100px">
+                            <div slot="error" class="image-slot">
+                                <img src="../../assets/images/error.gif" alt="" style="width: 160px;height: 100px;">
+                            </div>
+                        </el-image>
+                    </template>
                 </el-table-column>
-                <el-table-column prop="name" label="姓名" width="180">
+                <el-table-column prop="title" label="标题">
                 </el-table-column>
-                <el-table-column prop="address" label="地址">
+                <el-table-column label="状态">
+                    <template slot-scope="scope">
+                        <el-tag v-if="scope.row.status===0" type="info">草稿</el-tag>
+                        <el-tag v-if="scope.row.status===1" >待审核</el-tag>
+                        <el-tag v-if="scope.row.status===2" type="success">审核通过</el-tag>
+                        <el-tag v-if="scope.row.status===3" type="warning">审核失败</el-tag>
+                        <el-tag v-if="scope.row.status===4" type="danger">已删除</el-tag>
+                    </template>
                 </el-table-column>
-                <el-table-column label="操作">
-                    <el-button type="primary" plain icon="el-icon-edit" circle></el-button>
-                    <el-button type="danger" plain icon="el-icon-delete" circle></el-button>
+                <el-table-column prop="pubdate" label="发布时间"></el-table-column>
+                <el-table-column label="操作" width="120px">
+                    <template slot-scope="scope">
+                        <el-button type="primary" @click="$router.push('/publish?id='+scope.row.id)" plain icon="el-icon-edit" circle></el-button>
+                        <el-button type="danger" @click="delArticle(scope.row.id)" plain icon="el-icon-delete" circle></el-button>
+                    </template>
                 </el-table-column>
             </el-table>
+            <el-pagination
+                    class="pager"
+                    :current-page="reqParams.page"
+                    background layout="prev, pager, next"
+                    :page-size="reqParams.per_page"
+                    @current-change="changePager"
+                    :total="total">
+            </el-pagination>
         </el-card>
-
     </div>
 </template>
 <script>
 export default {
-
   data () {
     return {
       reqParams: {
         status: null,
         channel_id: null,
         begin_pubdate: null,
-        end_pubdate: null
+        end_pubdate: null,
+        page: 1,
+        per_page: 20
       },
-      channelOptions: [{
-        id: 1,
-        label: '黄金糕'
-      }, {
-        id: 2,
-        label: '双皮奶'
-      }],
+      channelOptions: [],
       dateArr: [],
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }]
+      articles: [],
+      total: 0
+    }
+  },
+  created () {
+    this.getChannelOptions()
+    this.getArticles()
+  },
+  methods: {
+    search () {
+      this.reqParams.page = 1
+      if (this.reqParams.channel_id === '') this.reqParams.channel_id = null
+      this.getArticles()
+    },
+    async getChannelOptions () {
+      // const arr = await this.$http.get('channel')
+      // console.log(arr)
+      const { data: { data } } = await this.$http.get('channels')
+      this.channelOptions = data.channels
+    },
+    async getArticles () {
+      const { data: { data } } = await this.$http.get('articles', { params: this.reqParams })
+      this.articles = data.results
+      this.total = data.total_count
+    },
+    changePager (newPager) {
+      this.reqParams.page = newPager
+      this.getArticles()
     }
   }
 }
@@ -102,5 +132,9 @@ export default {
 <style scoped lang="less">
     .box-card {
         margin-top: 20px;
+        .pager {
+            text-align: center;
+            margin-top: 20px;
+        }
     }
 </style>

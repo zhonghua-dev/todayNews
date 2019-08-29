@@ -1,5 +1,5 @@
 <template>
-    <el-select clearable v-model="value" placeholder="请选择">
+    <el-select @change="changeChannel" :value="value" clearable placeholder="请选择">
         <el-option
                 v-for="item in channelOptions"
                 :key="item.id"
@@ -12,9 +12,10 @@
 <script>
 export default {
   name: 'my-channel',
+  // props 属性只读
+  props: ['value'],
   data () {
     return {
-      value: null,
       channelOptions: []
     }
   },
@@ -23,10 +24,13 @@ export default {
   },
   methods: {
     async getChannelOptions () {
-      // const arr = await this.$http.get('channel')
-      // console.log(arr)
       const { data: { data } } = await this.$http.get('channels')
       this.channelOptions = data.channels
+    },
+    changeChannel (channelID) {
+      console.log(channelID)
+      // if (channelID === '') channelID = null
+      this.$emit('input', channelID)
     }
   }
 }

@@ -15,7 +15,7 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="频道：">
-                    <my-channel></my-channel>
+                    <my-channel v-model="reqParams.channel_id"></my-channel>
                 </el-form-item>
                 <el-form-item label="日期：">
                     <el-date-picker
@@ -112,7 +112,7 @@ export default {
     },
     search () {
       this.reqParams.page = 1
-      if (this.reqParams.channel_id === '') this.reqParams.channel_id = null
+      // if (this.reqParams.channel_id === '') this.reqParams.channel_id = null
       this.getArticles()
     },
     // async getChannelOptions () {
